@@ -1,0 +1,413 @@
+<?php
+session_start() ;
+session_regenerate_id(true);
+ if(!isset($_SESSION['pass']))
+ {
+  header("location:index.php");
+ }
+
+define('MYSITE_ARIFA',true);
+
+/*Pandey G Security */
+ if(isset($_SESSION['role'])!='Admin' ||isset($_SESSION['role'])!='Manger' ||isset($_SESSION['role'])!='User' ||isset($_SESSION['role'])!='Display' )
+  {
+    $url = $_SERVER['REQUEST_URI']; //returns the current URL
+    $parts = explode('/',$url);
+    $dir = $_SERVER['SERVER_NAME'];
+      for ($i = 0; $i < count($parts) - 1; $i++) {
+        $dir .= $parts[$i] . "/";
+      }
+        header('HTTP/1.0 403 Forbidden');
+      $contents = file_get_contents('http://'. $dir.'404.html', TRUE);
+    exit($contents);
+}
+/*End of Pandey G Security*/ 
+?>
+
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr">
+
+<?php include 'header.php'; 
+      include '../../public/include/datamysql.php';
+      date_default_timezone_set("Asia/Calcutta");
+      $date = date("Y-m-d"); //Today date 
+      $birth=substr("$date",5,2);
+      $ldate = date('Y-m-d',(strtotime ( '-1 day' , strtotime ( $date) ) ));
+
+     // check is IRIR Login session variable already created or not
+     if ( !isset($_SESSION["isIRISLogin"]) ){
+      // create session variable set it to false
+      $_SESSION["isIRISLogin"] = false;
+     }
+     
+     if ( $_SESSION["isIRISLogin"] === false &&  $_SESSION["einvoice_login"] === 'Y'  ){
+        // iris login
+       iris_login();
+       $_SESSION["isIRISLogin"] = true;
+     }
+     //echo $_SESSION["yearid"];
+?>
+
+<body class="nav-slim">
+
+<!-- ===============================================-->
+<!--    Main Content-->
+<!-- ===============================================-->
+<main class="main" id="top">
+<nav class="navbar navbar-vertical navbar-expand-lg">
+<script>
+  var navbarStyle = window.config.config.phoenixNavbarStyle;
+  if (navbarStyle && navbarStyle !== 'transparent') {
+    document.querySelector('body').classList.add(`navbar-${navbarStyle}`);
+  }
+</script>
+
+<div class="collapse navbar-collapse" id="navbarVerticalCollapse">
+  <!-- scrollbar removed-->
+  
+</div>
+<div class="navbar-vertical-footer">
+  <button class="btn navbar-vertical-toggle border-0 fw-semi-bold w-100 white-space-nowrap d-flex align-items-center"><span class="uil uil-left-arrow-to-left fs-0"></span><span class="uil uil-arrow-from-right fs-0"></span><span class="navbar-vertical-footer-text ms-2">Collapsed View</span></button>
+</div>
+</nav>
+<?php include("menubar.php") ?>
+<script>
+var body = document.querySelector('body');
+var navbarTopSlim = document.querySelector('#navbarTopSlim');
+var navbarVertical = document.querySelector('.navbar-vertical');
+var navbarTop = document.querySelector('.navbar-top');
+var documentElement = document.documentElement;
+
+navbarVertical.remove();
+navbarTopSlim.removeAttribute('style');
+navbarTop.classList.add('navbar-darker');
+body.classList.add('nav-slim');
+documentElement.classList.add('navbar-horizontal');
+</script>
+
+      <!-- ============================================-->
+      <!-- <section> begin ============================-->
+      <section class="py-0">
+
+        <div class="container-small">
+          <div class="ecommerce-topbar">
+          </div>
+        </div>
+        <!-- end of .container-->
+
+      </section>
+      <!-- <section> close ============================-->
+      <!-- ============================================-->
+
+
+      <nav class="ecommerce-navbar navbar-expand navbar-light bg-white justify-content-between">
+        <div class="container-small d-flex flex-between-center" data-navbar="data-navbar">
+          <div class="dropdown">
+            <button class="btn text-900 ps-0 pe-5 text-nowrap dropdown-toggle dropdown-caret-none" data-category-btn="data-category-btn" data-bs-toggle="dropdown"><span class="fas fa-bars me-2"></span>Category</button>
+            <div class="dropdown-menu border py-0 category-dropdown-menu">
+              <div class="card border-0 scrollbar" style="max-height: 657px;">
+                <div class="card-body p-6 pb-3">
+                  <div class="row gx-7 gy-5 mb-5">
+                    <div class="col-12 col-sm-6 col-md-4">
+                      <div class="d-flex align-items-center mb-3"><span class="text-primary me-2" data-feather="pocket" style="stroke-width:3;"></span>
+                        <h6 class="text-1000 mb-0 text-nowrap">Collectibles &amp; Art</h6>
+                      </div>
+                      <div class="ms-n2"><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Collectibles</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Antiques</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Sports memorabilia </a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Art</a>
+                      </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4">
+                      <div class="d-flex align-items-center mb-3"><span class="text-primary me-2" data-feather="home" style="stroke-width:3;"></span>
+                        <h6 class="text-1000 mb-0 text-nowrap">Home &amp; Gardan</h6>
+                      </div>
+                      <div class="ms-n2"><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Yard, Garden &amp; Outdoor</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Crafts</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Home Improvement</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Pet Supplies</a>
+                      </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4">
+                      <div class="d-flex align-items-center mb-3"><span class="text-primary me-2" data-feather="globe" style="stroke-width:3;"></span>
+                        <h6 class="text-1000 mb-0 text-nowrap">Sporting Goods</h6>
+                      </div>
+                      <div class="ms-n2"><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Outdoor Sports</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Team Sports</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Exercise &amp; Fitness</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Golf</a>
+                      </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4">
+                      <div class="d-flex align-items-center mb-3"><span class="text-primary me-2" data-feather="monitor" style="stroke-width:3;"></span>
+                        <h6 class="text-1000 mb-0 text-nowrap">Electronics</h6>
+                      </div>
+                      <div class="ms-n2"><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Computers &amp; Tablets</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Camera &amp; Photo</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">TV, Audio &amp; Surveillance</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Cell Ohone &amp; Accessories</a>
+                      </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4">
+                      <div class="d-flex align-items-center mb-3"><span class="text-primary me-2" data-feather="truck" style="stroke-width:3;"></span>
+                        <h6 class="text-1000 mb-0 text-nowrap">Auto Parts &amp; Accessories</h6>
+                      </div>
+                      <div class="ms-n2"><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">GPS &amp; Security Devices</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Rader &amp; Laser Detectors</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Care &amp; Detailing</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Scooter Parts &amp; Accessories</a>
+                      </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4">
+                      <div class="d-flex align-items-center mb-3"><span class="text-primary me-2" data-feather="codesandbox" style="stroke-width:3;"></span>
+                        <h6 class="text-1000 mb-0 text-nowrap">Toys &amp; Hobbies</h6>
+                      </div>
+                      <div class="ms-n2"><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Radio Control</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Kids Toys</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Action Figures</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Dolls &amp; Bears</a>
+                      </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4">
+                      <div class="d-flex align-items-center mb-3"><span class="text-primary me-2" data-feather="watch" style="stroke-width:3;"></span>
+                        <h6 class="text-1000 mb-0 text-nowrap">Fashion</h6>
+                      </div>
+                      <div class="ms-n2"><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Women</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Men</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Jewelry &amp; Watches</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Shoes</a>
+                      </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4">
+                      <div class="d-flex align-items-center mb-3"><span class="text-primary me-2" data-feather="music" style="stroke-width:3;"></span>
+                        <h6 class="text-1000 mb-0 text-nowrap">Musical Instruments &amp; Gear</h6>
+                      </div>
+                      <div class="ms-n2"><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Guitar</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Pro Audio Equipment</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">String</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Stage Lighting &amp; Effects</a>
+                      </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4">
+                      <div class="d-flex align-items-center mb-3"><span class="text-primary me-2" data-feather="grid" style="stroke-width:3;"></span>
+                        <h6 class="text-1000 mb-0 text-nowrap">Other Categories</h6>
+                      </div>
+                      <div class="ms-n2"><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Video Games &amp; Consoles</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Health &amp; Beauty</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Baby</a><a class="text-black d-block mb-1 text-decoration-none hover-bg-100 px-2 py-1 rounded-2" href="#!">Business &amp; Industrial</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-center border-top pt-3"><a class="fw-bold" href="#!">See all Categories<span class="fas fa-angle-right ms-1" data-fa-transform="down-1"></span></a></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ul class="navbar-nav justify-content-end align-items-center">
+            <li class="nav-item" data-nav-item="data-nav-item"><a class="nav-link ps-0" href="../../../apps/e-commerce/landing/homepage.html">Home</a></li>
+            <li class="nav-item" data-nav-item="data-nav-item"><a class="nav-link" href="../../../apps/e-commerce/landing/favourite-stores.html">My Favorites Stores</a></li>
+            <li class="nav-item" data-nav-item="data-nav-item"><a class="nav-link" href="../../../apps/e-commerce/landing/products-filter.html">Products</a></li>
+            <li class="nav-item" data-nav-item="data-nav-item"><a class="nav-link" href="../../../apps/e-commerce/landing/wishlist.html">Wishlist</a></li>
+            <li class="nav-item" data-nav-item="data-nav-item"><a class="nav-link" href="../../../apps/e-commerce/landing/shipping-info.html">Shipping Info</a></li>
+            <li class="nav-item" data-nav-item="data-nav-item"><a class="nav-link" href="../../../apps/e-commerce/admin/add-product.html">Be a vendor</a></li>
+            <li class="nav-item" data-nav-item="data-nav-item"><a class="nav-link active" href="../../../apps/e-commerce/landing/order-tracking.html">Track order</a></li>
+            <li class="nav-item" data-nav-item="data-nav-item"><a class="nav-link pe-0" href="../../../apps/e-commerce/landing/checkout.html">Checkout</a></li>
+            <li class="nav-item dropdown" data-nav-item="data-nav-item" data-more-item="data-more-item"><a class="nav-link dropdown-toggle dropdown-caret-none fw-bold pe-0" href="javascript: void(0)" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-boundary="window" data-bs-reference="parent">
+                More<span class="fas fa-angle-down ms-2"></span></a>
+              <div class="dropdown-menu dropdown-menu-end category-list" aria-labelledby="navbarDropdown" data-category-list="data-category-list"></div>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+
+      <!-- ============================================-->
+      <!-- <section> begin ============================-->
+      <section class="pt-5 pb-9">
+
+        <div class="container-small cart">
+          <nav class="mb-2" aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+              <li class="breadcrumb-item"><a href="#!">Page 1</a></li>
+              <li class="breadcrumb-item"><a href="#!">Page 2</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Default</li>
+            </ol>
+          </nav>
+          <div class="d-flex flex-wrap justify-content-between align-items-end mb-5">
+            <div>
+              <h2>Order #234 Status</h2>
+              <p class="text-800 mb-0">Payment Via <a class="fw-bold" href="#!">Cash on delivery</a>,<br class="d-sm-none"><span class="ms-sm-1">Nov 12, 2021, 8:54AM.</span></p>
+            </div>
+            <button class="btn btn-outline-primary mt-3"><span class="fa-solid fa-phone me-2"></span>Call Support</button>
+          </div>
+          <div class="row gy-9 gx-5">
+            <div class="col-12 col-lg-6">
+              <div class="border border-300 rounded-3 overflow-hidden h-100">
+                <div class="googlemap h-100 min-vh-50" data-googlemap data-latlng="40.7228022,-74.0020158" data-scrollwheel="false" data-zoom="15">
+                  <div class="marker-content py-2">
+                    <h5>Google map </h5>
+                    <p class="mb-0">A nice template for your site.<br>Customize it as you want.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6">
+              <div class="timeline-vertical">
+                <div class="timeline-item">
+                  <div class="row g-md-3 align-items-center mb-8 mb-lg-10">
+                    <div class="col-12 col-md-auto d-flex">
+                      <div class="timeline-item-date text-end order-1 order-md-0 me-md-4">
+                        <p class="fs--2 fw-semi-bold text-700 mb-0">23 August, 2023<br class="d-none d-md-block"> 10:30 AM</p>
+                      </div>
+                      <div class="timeline-item-bar position-relative me-3 me-md-0 border-400">
+                        <div class="icon-item icon-item-sm bg-success dark__bg-success"><span class="fa-solid fa-check text-white dark__text-white fs--2"></span></div><span class="timeline-bar border-end border-success"></span>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="timeline-item-content ps-6 ps-md-3">
+                        <h4>Order is processing</h4>
+                        <p class="fs--1 text-800 mb-0">Your package is ready for the seller to prepare.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="row g-md-3 align-items-center mb-8 mb-lg-10">
+                    <div class="col-12 col-md-auto d-flex">
+                      <div class="timeline-item-date text-end order-1 order-md-0 me-md-4">
+                        <p class="fs--2 fw-semi-bold text-700 mb-0">25 August, 2023<br class="d-none d-md-block"> 11:30 AM</p>
+                      </div>
+                      <div class="timeline-item-bar position-relative me-3 me-md-0 border-400">
+                        <div class="icon-item icon-item-sm bg-success dark__bg-success"><span class="fa-solid fa-check text-white dark__text-white fs--2"></span></div><span class="timeline-bar border-end border-warning"></span>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="timeline-item-content ps-6 ps-md-3">
+                        <h4>Picked Up</h4>
+                        <p class="fs--1 text-800 mb-0">Your package has been picked up from the seller.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="row g-md-3 align-items-center mb-8 mb-lg-10">
+                    <div class="col-12 col-md-auto d-flex">
+                      <div class="timeline-item-date text-end order-1 order-md-0 me-md-4">
+                        <p class="fs--2 fw-semi-bold text-700 mb-0">27 August, 2023<br class="d-none d-md-block"> 6:30 AM</p>
+                      </div>
+                      <div class="timeline-item-bar position-relative me-3 me-md-0 border-400">
+                        <div class="icon-item icon-item-sm bg-warning dark__bg-warning"><span class="fa-solid fa-truck-ramp-box text-white dark__text-white fs--2"></span></div><span class="timeline-bar border-end border-dashed border-400"></span>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="timeline-item-content ps-6 ps-md-3">
+                        <h4>Ready to Ship</h4>
+                        <p class="fs--1 text-800 mb-0">Your package is now ready to be shipped.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="row g-md-3 align-items-center mb-8 mb-lg-10">
+                    <div class="col-12 col-md-auto d-flex">
+                      <div class="timeline-item-date text-end order-1 order-md-0 me-md-4">
+                        <p class="fs--2 fw-semi-bold text-700 mb-0">Estimated time<br class="d-none d-md-block"> 29 August, 2023</p>
+                      </div>
+                      <div class="timeline-item-bar position-relative me-3 me-md-0 border-400">
+                        <div class="icon-item icon-item-sm bg-400"><span class="fa-solid fa-truck text-white dark__text-white fs--2"></span></div><span class="timeline-bar border-end border-dashed border-400"></span>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="timeline-item-content ps-6 ps-md-3">
+                        <h4>Shipped</h4>
+                        <p class="fs--1 text-800 mb-0">Pending</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="row g-md-3 align-items-center">
+                    <div class="col-12 col-md-auto d-flex">
+                      <div class="timeline-item-date text-end order-1 order-md-0 me-md-4">
+                        <p class="fs--2 fw-semi-bold text-700 mb-0">Estimated time<br class="d-none d-md-block"> 30 August, 2023</p>
+                      </div>
+                      <div class="timeline-item-bar position-relative me-3 me-md-0 border-400">
+                        <div class="icon-item icon-item-sm bg-400"><span class="fa-solid fa-truck-fast text-white dark__text-white fs--2"></span></div>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="timeline-item-content ps-6 ps-md-3">
+                        <h4>Delivered</h4>
+                        <p class="fs--1 text-800 mb-0">Pending</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end of .container-->
+
+      </section>
+      <!-- <section> close ============================-->
+      <!-- ============================================-->
+
+
+      <div class="support-chat-container">
+        <div class="container-fluid support-chat">
+          <div class="card bg-white">
+            <div class="card-header d-flex flex-between-center px-4 py-3 border-bottom">
+              <h5 class="mb-0 d-flex align-items-center gap-2">Demo widget<span class="fa-solid fa-circle text-success fs--3"></span></h5>
+              <div class="btn-reveal-trigger">
+                <button class="btn btn-link p-0 dropdown-toggle dropdown-caret-none transition-none d-flex" type="button" id="support-chat-dropdown" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fas fa-ellipsis-h text-900"></span></button>
+                <div class="dropdown-menu dropdown-menu-end py-2" aria-labelledby="support-chat-dropdown"><a class="dropdown-item" href="#!">Request a callback</a><a class="dropdown-item" href="#!">Search in chat</a><a class="dropdown-item" href="#!">Show history</a><a class="dropdown-item" href="#!">Report to Admin</a><a class="dropdown-item btn-support-chat" href="#!">Close Support</a></div>
+              </div>
+            </div>
+            <div class="card-body chat p-0">
+              <div class="d-flex flex-column-reverse scrollbar h-100 p-3">
+                <div class="text-end mt-6"><a class="mb-2 d-inline-flex align-items-center text-decoration-none text-1100 hover-bg-soft rounded-pill border border-primary py-2 ps-4 pe-3" href="#!">
+                    <p class="mb-0 fw-semi-bold fs--1">I need help with something</p><span class="fa-solid fa-paper-plane text-primary fs--1 ms-3"></span>
+                  </a><a class="mb-2 d-inline-flex align-items-center text-decoration-none text-1100 hover-bg-soft rounded-pill border border-primary py-2 ps-4 pe-3" href="#!">
+                    <p class="mb-0 fw-semi-bold fs--1">I can’t reorder a product I previously ordered</p><span class="fa-solid fa-paper-plane text-primary fs--1 ms-3"></span>
+                  </a><a class="mb-2 d-inline-flex align-items-center text-decoration-none text-1100 hover-bg-soft rounded-pill border border-primary py-2 ps-4 pe-3" href="#!">
+                    <p class="mb-0 fw-semi-bold fs--1">How do I place an order?</p><span class="fa-solid fa-paper-plane text-primary fs--1 ms-3"></span>
+                  </a><a class="false d-inline-flex align-items-center text-decoration-none text-1100 hover-bg-soft rounded-pill border border-primary py-2 ps-4 pe-3" href="#!">
+                    <p class="mb-0 fw-semi-bold fs--1">My payment method not working</p><span class="fa-solid fa-paper-plane text-primary fs--1 ms-3"></span>
+                  </a>
+                </div>
+                <div class="text-center mt-auto">
+                  <div class="avatar avatar-3xl status-online"><img class="rounded-circle border border-3 border-white" src="../assets/img/team/30.webp" alt="" /></div>
+                  <h5 class="mt-2 mb-3">Eric</h5>
+                  <p class="text-center text-black mb-0">Ask us anything – we’ll get back to you here or by email within 24 hours.</p>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer d-flex align-items-center gap-2 border-top ps-3 pe-4 py-3">
+              <div class="d-flex align-items-center flex-1 gap-3 border rounded-pill px-4">
+                <input class="form-control outline-none border-0 flex-1 fs--1 px-0" type="text" placeholder="Write message" />
+                <label class="btn btn-link d-flex p-0 text-500 fs--1 border-0" for="supportChatPhotos"><span class="fa-solid fa-image"></span></label>
+                <input class="d-none" type="file" accept="image/*" id="supportChatPhotos" />
+                <label class="btn btn-link d-flex p-0 text-500 fs--1 border-0" for="supportChatAttachment"> <span class="fa-solid fa-paperclip"></span></label>
+                <input class="d-none" type="file" id="supportChatAttachment" />
+              </div>
+              <button class="btn p-0 border-0 send-btn"><span class="fa-solid fa-paper-plane fs--1"></span></button>
+            </div>
+          </div>
+        </div>
+        <button class="btn p-0 border border-200 btn-support-chat"><span class="fs-0 btn-text text-primary text-nowrap">Chat demo</span><span class="fa-solid fa-circle text-success fs--1 ms-2"></span><span class="fa-solid fa-chevron-down text-primary fs-1"></span></button>
+      </div>
+
+
+      <!-- ============================================-->
+      <!-- <section> begin ============================-->
+      <section class="bg-100 dark__bg-1100 py-9">
+
+        <div class="container-small">
+          <div class="row justify-content-between gy-4">
+            <div class="col-12 col-lg-4">
+              <div class="d-flex align-items-center mb-3"><img src="../assets/img/icons/logo.png" alt="phoenix" width="27" />
+                <p class="logo-text ms-2">phoenix</p>
+              </div>
+              <p class="text-700 mb-1 fw-semi-bold lh-sm fs--1">Phoenix is an admin dashboard template with fascinating features and amazing layout. The template is responsive to all major browsers and is compatible with all available devices and screen sizes.</p>
+            </div>
+            <div class="col-6 col-md-auto">
+              <h5 class="fw-bolder mb-3">About Phoenix</h5>
+              <div class="d-flex flex-column"><a class="text-700 fw-semi-bold fs--1 mb-1" href="#!">Careers</a><a class="text-700 fw-semi-bold fs--1 mb-1" href="#!">Affiliate Program</a><a class="text-700 fw-semi-bold fs--1 mb-1" href="#!">Privacy Policy</a><a class="text-700 fw-semi-bold fs--1 mb-1" href="#!">Terms & Conditions</a></div>
+            </div>
+            <div class="col-6 col-md-auto">
+              <h5 class="fw-bolder mb-3">Stay Connected</h5>
+              <div class="d-flex flex-column"><a class="text-700 fw-semi-bold fs--1 mb-1" href="#!">Blogs</a><a class="mb-1 fw-semi-bold fs--1 d-flex" href="#!"><span class="fab fa-facebook-square text-primary me-2 fs-0"></span><span class="text-800">Facebook</span></a><a class="mb-1 fw-semi-bold fs--1 d-flex" href="#!"><span class="fab fa-twitter-square text-info me-2 fs-0"></span><span class="text-800">Twitter</span></a></div>
+            </div>
+            <div class="col-6 col-md-auto">
+              <h5 class="fw-bolder mb-3">Customer Service</h5>
+              <div class="d-flex flex-column"><a class="text-700 fw-semi-bold fs--1 mb-1" href="#!">Help Desk</a><a class="text-700 fw-semi-bold fs--1 mb-1" href="#!">Support, 24/7</a><a class="text-700 fw-semi-bold fs--1 mb-1" href="#!">Community of Phoenix</a></div>
+            </div>
+            <div class="col-6 col-md-auto">
+              <h5 class="fw-bolder mb-3">Payment Method</h5>
+              <div class="d-flex flex-column"><a class="text-700 fw-semi-bold fs--1 mb-1" href="#!">Cash on Delivery</a><a class="text-700 fw-semi-bold fs--1 mb-1" href="#!">Online Payment</a><a class="text-700 fw-semi-bold fs--1 mb-1" href="#!">PayPal</a><a class="text-700 fw-semi-bold fs--1 mb-1" href="#!">Installment</a></div>
+            </div>
+          </div>
+        </div>
+        <!-- end of .container-->
+
+      </section>
+      <!-- <section> close ============================-->
+      <!-- ============================================-->
+
+
+      <?php include 'footer.php';?>
